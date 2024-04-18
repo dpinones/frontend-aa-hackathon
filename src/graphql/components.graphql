@@ -1,0 +1,60 @@
+query GlobalScores($version: u32, $limit: Int, $cursor: Cursor) {
+  playerModels(
+    where: { game_over: true, leaderboard_version: $version }
+    order: { direction: DESC, field: CASH }
+    first: $limit
+    after: $cursor
+  ) {
+    totalCount
+    edges {
+      node {
+        game_id
+        player_id
+        name
+        avatar_id
+        cash
+        health
+        turn
+        game_over
+      }
+      cursor
+    }
+  }
+}
+
+query MarketPrices($gameId: u32) {
+  marketModels(first: 36, where: { game_id: $gameId }) {
+    edges {
+      node {
+        drug_id
+        location_id
+        quantity
+        cash
+      }
+    }
+  }
+}
+
+query RyoMetas {
+  ryoMetaModels(limit: 1) {
+    edges {
+      node {
+        id
+        initialized
+        leaderboard_version
+      }
+    }
+  }
+}
+
+query LeaderboardMetas($version: u32) {
+  leaderboardModels(where: { version: $version }) {
+    edges {
+      node {
+        version
+        high_score
+        next_version_timestamp
+      }
+    }
+  }
+}

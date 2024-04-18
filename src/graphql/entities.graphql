@@ -1,0 +1,128 @@
+fragment PlayerProps on Player {
+  name
+  avatar_id
+  mainnet_address
+  cash
+  status
+  hood_id
+  location_id
+  drug_count
+  health
+  turn
+  max_turns
+  max_items
+  attack
+  defense
+  transport
+  speed
+  wanted
+  game_over
+  is_drugged
+}
+
+query PlayerEntity($gameId: String!, $playerId: String!) {
+  entities(keys: [$gameId, $playerId]) {
+    totalCount
+    edges {
+      node {
+        id
+        models {
+          __typename
+          ... on Player {
+            ...PlayerProps
+          }
+          ... on Drug {
+            drug_id
+            quantity
+          }
+          ... on Item {
+            item_id
+            level
+            name
+            value
+          }
+          ... on Encounter {
+            encounter_id
+            level
+            health
+            payout
+          }
+        }
+      }
+    }
+  }
+}
+
+subscription PlayerEntitySubscription($id: ID) {
+  entityUpdated(id: $id) {
+    id
+    keys
+    models {
+      __typename
+      ... on Player {
+        ...PlayerProps
+      }
+    }
+  }
+}
+
+subscription PlayerEntityRelatedDataSubscription($id: ID) {
+  entityUpdated(id: $id) {
+    id
+    keys
+    models {
+      __typename
+      ... on Drug {
+        drug_id
+        quantity
+      }
+      ... on Item {
+        item_id
+        level
+        name
+        value
+      }
+      ... on Encounter {
+        encounter_id
+        level
+        health
+        payout
+      }
+    }
+  }
+}
+
+query LocationEntities($gameId: String!, $locationId: String!) {
+  entities(keys: [$gameId, $locationId]) {
+    totalCount
+    edges {
+      node {
+        keys
+        models {
+          __typename
+          ... on Market {
+            cash
+            quantity
+            location_id
+            drug_id
+          }
+        }
+      }
+      cursor
+    }
+  }
+}
+
+query PlayerLogs($game_id: String!, $player_id: String!) {
+  events(last: 1000, keys: ["*", $game_id, $player_id]) {
+    totalCount
+    edges {
+      node {
+        id
+        keys
+        data
+        createdAt
+      }
+    }
+  }
+}
